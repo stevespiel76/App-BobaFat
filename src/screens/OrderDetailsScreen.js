@@ -1,28 +1,30 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from 'react-native';
-import { SafeAreaView as SafeAreaViewRN } from 'react-native-safe-area-context';
+import React from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OrderDetailsScreen({ route }) {
-  const { personalization, pickupTime, items } = route.params;
+  const { order } = route.params || {};
+  const allItems = [...order.drinks, ...order.foods];
+  const orderedItems = allItems.filter((item) => order.quantities[item.id] > 0);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safeArea}>
       <Text style={styles.title}>Order Details</Text>
 
       <Text style={styles.label}>Personalization:</Text>
-      <Text style={styles.value}>{personalization || 'None'}</Text>
+      <Text style={styles.value}>{order.personalization || "None"}</Text>
 
       <Text style={styles.label}>Pickup Time:</Text>
-      <Text style={styles.value}>{pickupTime || 'Not set'}</Text>
+      <Text style={styles.value}>{order.pickupTime || "Not specified"}</Text>
 
       <Text style={styles.label}>Items:</Text>
       <FlatList
-        data={items}
+        data={orderedItems}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemName}>{item.title}</Text>
-            <Text>{item.price}</Text>
+          <View style={styles.itemRow}>
+            <Text>{item.name}</Text>
+            <Text>Qty: {order.quantities[item.id]}</Text>
           </View>
         )}
       />
@@ -31,9 +33,12 @@ export default function OrderDetailsScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    marginVertical: 10,
+  safeArea: { flex: 1, marginVertical: 10, marginHorizontal: 6 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
+  label: { fontWeight: "bold", marginTop: 10 },
+  value: { marginBottom: 8 },
+  itemRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
+});
     marginHorizontal: 6,
   },
   title: {
